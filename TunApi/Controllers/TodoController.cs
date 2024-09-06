@@ -1,0 +1,87 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using TunApi.Models;
+using TunApi.Data;
+
+namespace TunApi.Controllers
+{
+    [ApiController]
+    [Route("api/[controller]")]
+    public class TodoController : ControllerBase
+    {
+        private readonly AppDbContext _context;
+
+        public TodoController(AppDbContext context)
+        {
+            _context = context;
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAllTodo()
+        {
+            var todos = new List<Todo>
+            {
+                new Todo
+                {
+                    Id = 1,
+                    Title = "Learn C#",
+                    IsCompleted = false,
+                    CreatedAt = DateTime.Now
+                },
+                new Todo
+                {
+                    Id = 2,
+                    Title = "Learn ASP.NET Core",
+                    IsCompleted = false,
+                    CreatedAt = DateTime.Now
+                }
+            };
+
+            todos = await _context.Todo.ToListAsync();
+            return Ok(todos);
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetTodoById(int id)
+        {
+            var todo = await _context.Todo.FindAsync(id);
+
+            if (todo == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(todo);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateTodoItem(Todo todo)
+        {
+            todo.CreatedAt = DateTime.Now.ToUniversalTime();
+            _context.Todo.Add(todo);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction("GetTodoById", new { id = todo.Id }, todo);
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateTodoItem(int id, Todo todo)
+        {
+            var dbTodo = await _context.Todo.FindAsync(id);
+            if (dbTodo == null)
+            {
+                return NotFound("Todo not found");
+            }
+
+            dbTodo.Title = todo.Title;
+            dbTodo.IsCompleted = todo.IsCompleted;
+
+            await _context.SaveChangesAsync();
+            return Ok(await _context.Todo.FindAsync(id));
+        }
+    }
+}
