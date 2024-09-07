@@ -7,7 +7,7 @@ public class TodoDto
     public string titlex { get; set; }
     public string description { get; set; }
     //public bool isCompleted { get; set; } = true;
-    public DateTime createdAt { get; set; }
+    public DateTime? createdAt { get; set; }
     //public List<TodoFileDto> todoFiles { get; set; }
 
     // Constructor to map Parent model to ParentDto

@@ -22,6 +22,6 @@ namespace TunApi.Models
 
         // Navigation property for related TodoFiles
         [JsonIgnore]
-        public ICollection<TodoFile> TodoFiles { get; set; }
+        public ICollection<TodoFile>? TodoFiles { get; set; }
     }
 }
