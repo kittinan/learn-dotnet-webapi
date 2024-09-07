@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace TunApi.Models
 {
@@ -18,5 +19,9 @@ namespace TunApi.Models
         public bool IsCompleted { get; set; }
 
         public DateTime CreatedAt { get; set; }
+
+        // Navigation property for related TodoFiles
+        [JsonIgnore]
+        public ICollection<TodoFile> TodoFiles { get; set; }
     }
 }

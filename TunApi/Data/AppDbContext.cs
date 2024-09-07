@@ -10,5 +10,16 @@ namespace TunApi.Data
         }
 
         public DbSet<Todo> Todo { get; set; }
+        public DbSet<TodoFile> TodoFiles { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<Todo>()
+                .HasMany(t => t.TodoFiles)
+                .WithOne(tf => tf.Todo)
+                .HasForeignKey(tf => tf.TodoId);
+        }
     }
 }

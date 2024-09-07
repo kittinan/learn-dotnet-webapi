@@ -48,14 +48,28 @@ namespace TunApi.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetTodoById(int id)
         {
-            var todo = await _context.Todo.FindAsync(id);
+            var todo = await _context.Todo
+                .Where(t => t.Id == id)
+                .Include(t => t.TodoFiles)
+                .FirstOrDefaultAsync();
 
             if (todo == null)
             {
                 return NotFound();
             }
 
-            return Ok(todo);
+            Console.WriteLine("TODO: ");
+            Console.WriteLine(todo.Id);
+            Console.WriteLine(todo.Title);
+
+            foreach (var todoFile in todo.TodoFiles)
+            {
+                Console.WriteLine($"Child Id: {todoFile.Id}, FilePath: {todoFile.FilePath}");
+            }
+
+            var todoDto = new TodoDto(todo);
+
+            return Ok(todoDto);
         }
 
         [HttpPost]
