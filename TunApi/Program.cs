@@ -1,7 +1,21 @@
+using DotNetEnv;
 using Microsoft.EntityFrameworkCore;
 using TunApi.Data;
 
 var builder = WebApplication.CreateBuilder(args);
+
+Env.Load();
+
+// Retrieve database connection details from environment variables
+string dbHost = Environment.GetEnvironmentVariable("DB_HOST");
+string dbPort = Environment.GetEnvironmentVariable("DB_PORT");
+string dbName = Environment.GetEnvironmentVariable("DB_NAME");
+string dbUser = Environment.GetEnvironmentVariable("DB_USER");
+string dbPassword = Environment.GetEnvironmentVariable("DB_PASSWORD");
+
+// Create the connection string
+string connectionString = $"Host={dbHost};Port={dbPort};Database={dbName};Username={dbUser};Password={dbPassword}";
+
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -11,7 +25,7 @@ builder.Services.AddControllers();
 
 var Configuration = builder.Configuration;
 builder.Services.AddDbContext<AppDbContext>(options =>
-        options.UseNpgsql(Configuration.GetConnectionString("DefaultConnection")));
+        options.UseNpgsql(connectionString));
 
 var app = builder.Build();
 
