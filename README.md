@@ -37,3 +37,9 @@ dotnet run
 # or
 dotnet watch
 ```
+
+- Console command with IHostedService
+
+```
+dotnet run -- create-user USERNAME PASSWORD
+```

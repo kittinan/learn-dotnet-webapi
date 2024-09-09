@@ -4,6 +4,9 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using System.Text;
 using TunApi.Data;
 
@@ -58,6 +61,16 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddAuthorization();
 builder.Services.AddControllers();
+
+try
+{
+    builder.Services.AddHostedService<CustomHostedService>();
+}
+catch (Exception ex)
+{
+    var logger = LoggerFactory.Create(logging => logging.AddConsole()).CreateLogger<Program>();
+    logger.LogError(ex, "An error occurred while adding the hosted service.");
+}
 
 var app = builder.Build();
 
