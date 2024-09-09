@@ -115,6 +115,10 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+// Register the middleware
+app.UseMiddleware<RequestTimingMiddleware>();
+
 app.Run();
 
 record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
