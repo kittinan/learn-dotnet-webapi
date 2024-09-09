@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 using TunApi.Models;
 using TunApi.Data;
@@ -51,6 +52,15 @@ namespace TunApi.Controllers
         [Authorize]
         public async Task<IActionResult> GetTodoById(int id)
         {
+
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier); // Get user ID from claims
+            var userName = User.FindFirstValue(ClaimTypes.Name);
+            var email = User.FindFirstValue(ClaimTypes.Email); // Get email
+
+            Console.WriteLine($"User ID: {userId}");
+            Console.WriteLine($"Username: {userName}");
+            Console.WriteLine($"Email: {email}");
+
             var todo = await _context.Todo
                 .Where(t => t.Id == id)
                 .Include(t => t.TodoFiles)
