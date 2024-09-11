@@ -19,7 +19,6 @@ namespace TunApi.Controllers
         private readonly UserManager<IdentityUser> _userManager;
         private readonly SignInManager<IdentityUser> _signInManager;
         private readonly IConfiguration _configuration;
-
         private readonly AppDbContext _context;
 
         public AuthController(UserManager<IdentityUser> userManager,
@@ -38,6 +37,8 @@ namespace TunApi.Controllers
         {
             var user = new IdentityUser { UserName = model.Username, Email = model.Email };
             var result = await _userManager.CreateAsync(user, model.Password);
+
+            await _userManager.AddToRoleAsync(user, "User");
 
             if (result.Succeeded)
             {
@@ -59,7 +60,7 @@ namespace TunApi.Controllers
             if (!result.Succeeded)
                 return Unauthorized();
 
-            var token = GenerateJwtToken(user);
+            var token = await GenerateJwtToken(user);
             var refreshToken = GenerateRefreshToken();
 
             var refreshTokenEntity = new RefreshToken
@@ -80,9 +81,9 @@ namespace TunApi.Controllers
             });
         }
 
-        private string GenerateJwtToken(IdentityUser user)
+        private async Task<string> GenerateJwtToken(IdentityUser user)
         {
-            var claims = new[]
+            var claims = new List<Claim>
             {
                 new Claim(JwtRegisteredClaimNames.Sub, user.Id),
                 new Claim(JwtRegisteredClaimNames.Name, user.UserName),
@@ -90,6 +91,13 @@ namespace TunApi.Controllers
                 //new Claim(ClaimTypes.NameIdentifier, user.Id), // NameIdentifier claim (User ID)
                 new Claim(ClaimTypes.Name, user.UserName) // ClaimTypes.Name for username
             };
+
+            // Claims for roles
+            var roles = await _userManager.GetRolesAsync(user);
+            foreach (var role in roles)
+            {
+                claims.Add(new Claim(ClaimTypes.Role, role));
+            }
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
@@ -131,7 +139,7 @@ namespace TunApi.Controllers
                 return Unauthorized();
             }
 
-            var token = GenerateJwtToken(user);
+            var token = await GenerateJwtToken(user);
             var newRefreshToken = GenerateRefreshToken();
 
             // Save new Refresh Token to the database

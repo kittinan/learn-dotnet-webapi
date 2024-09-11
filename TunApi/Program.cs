@@ -9,6 +9,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System.Text;
 using TunApi.Data;
+using TunApi.Data.Seeds;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -60,6 +61,12 @@ builder.Services.AddAuthentication(options =>
 });
 
 builder.Services.AddAuthorization();
+// builder.Services.AddAuthorization(options =>
+// {
+//     options.AddPolicy("RequireAdminRole", policy => policy.RequireRole("Admin"));
+// });
+
+
 builder.Services.AddControllers();
 
 try
@@ -77,8 +84,17 @@ var app = builder.Build();
 // Apply any pending migrations
 using (var scope = app.Services.CreateScope())
 {
+    Console.WriteLine("Applying migrations...");
     var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     dbContext.Database.Migrate(); // Applies migrations at runtime
+
+    // query user identity
+    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
+    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+
+    // Apply seed data
+    var services = scope.ServiceProvider;
+    await RoleSeed.Initialize(services);
 }
 
 // Configure the HTTP request pipeline.

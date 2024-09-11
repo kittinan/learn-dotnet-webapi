@@ -23,7 +23,8 @@ namespace TunApi.Controllers
             _context = context;
         }
 
-        [HttpGet]
+        [Authorize(Roles = "Admin")]
+        [HttpGet("")]
         public async Task<IActionResult> GetAllTodo()
         {
             var todos = new List<Todo>
