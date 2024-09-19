@@ -7,8 +7,10 @@ public class TodoDto
     public string titlex { get; set; }
     public string description { get; set; }
     //public bool isCompleted { get; set; } = true;
-    public DateTime? createdAt { get; set; }
+    public DateTime? created { get; set; }
     //public List<TodoFileDto> todoFiles { get; set; }
+
+    public string status { get; set; }
 
     // Constructor to map Parent model to ParentDto
     public TodoDto(Todo todo)
@@ -16,5 +18,6 @@ public class TodoDto
         id = todo.Id;
         titlex = todo.Title;
         description = todo.Description;
+        status = todo.Status.ToString();
     }
 }

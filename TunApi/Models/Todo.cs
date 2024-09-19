@@ -23,5 +23,13 @@ namespace TunApi.Models
         // Navigation property for related TodoFiles
         [JsonIgnore]
         public ICollection<TodoFile>? TodoFiles { get; set; }
+        // Use the enum for the Status field
+        public TodoStatus Status { get; set; } = TodoStatus.Active;
+    }
+
+    public enum TodoStatus
+    {
+        Active,
+        Deleted
     }
 }
